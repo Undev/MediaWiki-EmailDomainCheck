@@ -6,7 +6,7 @@
  *
  * @package MediaWiki
  * @subpackage Extensions
- * @author wookienz <wookienz@gmail.com>
+ * @author halfi <halfi@halfi.ru>
  */
 
 /**
@@ -21,11 +21,12 @@ $wgExtensionCredits['other'][] = array(
     'path' => __FILE__,
     'name' => 'Email Domain Check',
     'author' => 'Halfi',
-    'url' => 'https://www.halfi.ru',
+    'url' => 'https://halfi.ru',
     'descriptionmsg' => 'emaildomaincheck-desc',
 );
 
 $wgHooks['GetPreferences'][] = 'efEmailDomainCheckPref';
+$wgHooks['AbortNewAccount'][] = 'efEmailDomainCheckReg';
 
 /**
  * Hooks the profile edit process,
@@ -48,18 +49,38 @@ function efEmailDomainCheckPref( $user, &$defaultPreferences ) {
     return true;
 }
 
+
+
+function efEmailDomainCheckReg( $user, &$error ) {
+
+    $validation = preferencesDomainCheck::validation($user->getEmail());
+
+    if ($validation !== true) {
+        $error = $validation;
+        return false;
+    }
+    return true;
+}
+
 class preferencesDomainCheck {
     static function validateEmail( $email, $alldata ) {
         global $wgExtensionCredits;
-        global $wgEmailDomain;
 
         $returnOriginalFunc = call_user_func( $wgExtensionCredits['validation-default-callback'], $email, $alldata );
 
-        if ( isset( $wgEmailDomain ) && $returnOriginalFunc === true) {
+        if ( $returnOriginalFunc === true) {
+            return self::validation($email);
+        }
+
+        return $returnOriginalFunc;
+    }
+
+    static function validation ($email) {
+        global $wgEmailDomain;
+
+        if ( isset( $wgEmailDomain ) && !empty($email)) {
 
             list( , $host ) = explode( "@", $email);
-
-            if (empty($email)) return true;
 
             $wgEmailDomainArray = explode(',', $wgEmailDomain);
 
@@ -75,7 +96,6 @@ class preferencesDomainCheck {
             }
 
         }
-
-        return $returnOriginalFunc;
+        return true;
     }
 }
