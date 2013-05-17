@@ -6,96 +6,49 @@
  *
  * @package MediaWiki
  * @subpackage Extensions
- * @author halfi <halfi@halfi.ru>
+ * @author wookienz <wookienz@gmail.com>
  */
 
 /**
  * email domain that user must come from
  */
 
-// $wgEmailDomain = 'somedomain.org'; or $wgEmailDomain = 'somedomain.org, example.com';
-
+// $wgEmailDomain = 'somedomain.org';
 $wgExtensionMessagesFiles['EmailDomainCheck'] = dirname(__FILE__) . '/EmailDomainCheck.i18n.php';
 
 $wgExtensionCredits['other'][] = array(
     'path' => __FILE__,
     'name' => 'Email Domain Check',
-    'author' => 'Halfi',
-    'url' => 'https://halfi.ru',
+    'author' => 'Wookienz',
+    'url' => 'https://www.mediawiki.org/wiki/Extension:EmailDomainCheck',
     'descriptionmsg' => 'emaildomaincheck-desc',
 );
 
-$wgHooks['GetPreferences'][] = 'efEmailDomainCheckPref';
-$wgHooks['AbortNewAccount'][] = 'efEmailDomainCheckReg';
+
+$wgHooks['AbortNewAccount'][] = 'efEmailDomainCheck';
 
 /**
- * Hooks the profile edit process,
- * will cancel the prcoess if the dmain is not in list.
+ * Hooks the account creation process,
+ * will cancel the prcoess if the dmain is not correct.
  *
  * @param User $user User object being created
  * @param string $error Reference to the error message to show
  * @return bool
  */
-function efEmailDomainCheckPref( $user, &$defaultPreferences ) {
-    global $wgExtensionCredits;
-
-    $wgExtensionCredits['validation-default-callback'] = $defaultPreferences['emailaddress']['validation-callback'];
-
-    $defaultPreferences['emailaddress']['validation-callback'] = array(
-        'preferencesDomainCheck',
-        'validateEmail'
-    );
-
-    return true;
-}
 
 
+function efEmailDomainCheck( $user, &$error ) {
+    global $wgEmailDomain;
 
-function efEmailDomainCheckReg( $user, &$error ) {
+    if ( isset( $wgEmailDomain ) ) {
 
-    $validation = preferencesDomainCheck::validation($user->getEmail());
-
-    if ($validation !== true) {
-        $error = $validation;
-        return false;
-    }
-    return true;
-}
-
-class preferencesDomainCheck {
-    static function validateEmail( $email, $alldata ) {
-        global $wgExtensionCredits;
-
-        $returnOriginalFunc = call_user_func( $wgExtensionCredits['validation-default-callback'], $email, $alldata );
-
-        if ( $returnOriginalFunc === true) {
-            return self::validation($email);
+        list( $name, $host ) = explode( "@", $user->getEmail() );
+        //if ( stripos( $host, $wgEmailDomain ) != false ) { // use this line to allow subdomains of $wgEmailDomain
+        if ( $host == $wgEmailDomain ) {
+            return true;
+        } else {
+            $error = wfMsgHtml( 'emaildomaincheck-error', $wgEmailDomain );
+            return false;
         }
-
-        return $returnOriginalFunc;
-    }
-
-    static function validation ($email) {
-        global $wgEmailDomain;
-
-        if ( isset( $wgEmailDomain ) && !empty($email)) {
-
-            list( , $host ) = explode( "@", $email);
-
-            $wgEmailDomainArray = explode(',', $wgEmailDomain);
-
-            foreach($wgEmailDomainArray as $allowedDomain) {
-                $allow = false;
-                if ( $host == trim($allowedDomain) ) {
-                    $allow = true;
-                    break;
-                }
-            }
-            if (!$allow) {
-                return wfMsgHtml( 'emaildomaincheck-error', $wgEmailDomain );
-            }
-
-        }
-        return true;
     }
 }

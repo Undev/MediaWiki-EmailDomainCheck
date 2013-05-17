@@ -18,7 +18,14 @@ $messages['en'] = array(
 /** German (Deutsch)
  * @author SVG
  */
-$messages['ru'] = array(
-    'emaildomaincheck-desc'  => 'Проверяет email по домену из списка.',
-    'emaildomaincheck-error' => 'Email адрес не в списке разрешенных адресов. Пожалуйста введите адрес корпоративной почты на домене из списка $1.',
+$messages['de'] = array(
+    'emaildomaincheck-desc'  => 'Erzwingt eine bestimmte E-Mail-Domain bei der Registrierung',
+    'emaildomaincheck-error' => 'Die Domain deiner E-Mail-Adresse ist ungültig. Deine E-Mail-Adresse muss enden mit $1.',
+);
+
+/** German (formal address) (Deutsch (Sie-Form))
+ * @author SVG
+ */
+$messages['de-formal'] = array(
+    'emaildomaincheck-error' => 'Die Domain Ihrer E-Mail-Adresse ist ungültig. Ihre E-Mail-Adresse muss enden mit $1.',
 );
