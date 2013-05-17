@@ -44,7 +44,7 @@ function efEmailDomainCheck( $user, &$error ) {
 
         list( $name, $host ) = explode( "@", $user->getEmail() );
         //if ( stripos( $host, $wgEmailDomain ) != false ) { // use this line to allow subdomains of $wgEmailDomain
-        if ( $host == $wgEmailDomain ) {
+        if ( in_array($host, $wgEmailDomain) ) {
             return true;
         } else {
             $error = wfMsgHtml( 'emaildomaincheck-error', $wgEmailDomain );
