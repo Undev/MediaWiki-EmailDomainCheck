@@ -29,3 +29,11 @@ $messages['de'] = array(
 $messages['de-formal'] = array(
     'emaildomaincheck-error' => 'Die Domain Ihrer E-Mail-Adresse ist ungültig. Ihre E-Mail-Adresse muss enden mit $1.',
 );
+
+/** Russian
+ * @author Wookienz
+ */
+$messages['ru'] = array(
+    'emaildomaincheck-desc'  => 'Обеспечивает соблюдение определенного домена e-mail при регистрации',
+    'emaildomaincheck-error' => 'Для регистрации требуется, чтобы почтовый адрес кончался на $1, $2, $3, $4 и так далее.',
+);
